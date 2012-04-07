@@ -1,0 +1,39 @@
+Index: D:/Dropbox/Dev/avrgcc/SP JTAG USB/avrdude-5.11.1-usbaspboot/usbasp.c
+===================================================================
+--- D:/Dropbox/Dev/avrgcc/SP JTAG USB/avrdude-5.11.1-usbaspboot/usbasp.c	(revision 39)
++++ D:/Dropbox/Dev/avrgcc/SP JTAG USB/avrdude-5.11.1-usbaspboot/usbasp.c	(revision 130)
+@@ -579,6 +579,7 @@
+ {
+   unsigned char cmd[4];
+   unsigned char res[4];
++  int i;
+ 
+   if (p->op[AVR_OP_CHIP_ERASE] == NULL) {
+     fprintf(stderr, "chip erase instruction not defined for part \"%s\"\n",
+@@ -590,7 +591,8 @@
+ 
+   avr_set_bits(p->op[AVR_OP_CHIP_ERASE], cmd);
+   pgm->cmd(pgm, cmd, res);
+-  usleep(p->chip_erase_delay);
++  for(i=0; i<10; i++)
++      usleep(50000);
+   pgm->initialize(pgm, p);
+ 
+   return 0;
+@@ -689,6 +691,8 @@
+      blocksize = USBASP_WRITEBLOCKSIZE;
+   }
+ 
++  blocksize = page_size;
++
+   while (wbytes) {
+ 
+     if (wbytes <= blocksize) {
+@@ -718,6 +722,7 @@
+     blockflags = 0;
+ 
+     n = usbasp_transmit(pgm, 0, function, cmd, buffer, blocksize);
++    usleep(100000);
+ 
+     if (n != blocksize) {
+       fprintf(stderr, "%s: error: wrong count at writing %x\n",
