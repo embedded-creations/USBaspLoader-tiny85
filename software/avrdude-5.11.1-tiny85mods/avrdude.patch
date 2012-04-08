@@ -1,7 +1,5 @@
-Index: D:/Dropbox/Dev/avrgcc/SP JTAG USB/avrdude-5.11.1-usbaspboot/usbasp.c
-===================================================================
---- D:/Dropbox/Dev/avrgcc/SP JTAG USB/avrdude-5.11.1-usbaspboot/usbasp.c	(revision 39)
-+++ D:/Dropbox/Dev/avrgcc/SP JTAG USB/avrdude-5.11.1-usbaspboot/usbasp.c	(revision 130)
+--- usbasp.c	Thu Sep 15 07:37:05 2011
++++ usbasp.c	Sat Apr  7 19:34:33 2012
 @@ -579,6 +579,7 @@
  {
    unsigned char cmd[4];
@@ -15,25 +13,19 @@ Index: D:/Dropbox/Dev/avrgcc/SP JTAG USB/avrdude-5.11.1-usbaspboot/usbasp.c
    avr_set_bits(p->op[AVR_OP_CHIP_ERASE], cmd);
    pgm->cmd(pgm, cmd, res);
 -  usleep(p->chip_erase_delay);
-+  for(i=0; i<10; i++)
-+      usleep(50000);
++  // delay long enough for USBaspLoader-tiny85 to erase all pages individually
++  usleep(500000);
    pgm->initialize(pgm, p);
  
    return 0;
-@@ -689,6 +691,8 @@
+@@ -688,6 +690,10 @@
+   } else {
       blocksize = USBASP_WRITEBLOCKSIZE;
    }
- 
-+  blocksize = page_size;
 +
++  /* set blocksize to pagesize, so there can be a pause in USB traffic between pages to allow USBaspLoader-tiny85 to
++   * write the page to flash before needing to respond to the next USB message */
++  blocksize = page_size;
+ 
    while (wbytes) {
  
-     if (wbytes <= blocksize) {
-@@ -718,6 +722,7 @@
-     blockflags = 0;
- 
-     n = usbasp_transmit(pgm, 0, function, cmd, buffer, blocksize);
-+    usleep(100000);
- 
-     if (n != blocksize) {
-       fprintf(stderr, "%s: error: wrong count at writing %x\n",
