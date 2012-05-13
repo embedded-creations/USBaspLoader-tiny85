@@ -38,8 +38,8 @@ of CPU cycles, but even an exact number of cycles!
 
 ; the code enabled by TINY85MODE is inteded only for use with the tiny85-compatible USBaspLoader
 ; project.  
-; with TINY85MODE set, the beginning of the ISR checks for a program counter < BOOTLOADER_ADDRESS
-; and jumps to the application's ISR
+; with TINY85MODE set, the beginning of the ISR checks for a magic word "B007" at the very bottom of the stack
+; and jumps to the application's ISR if the magic word isn't present
 ; the max allowable interrupt latency is lower given this additional code before getting to the 
 ; USB-specific portion of the ISR.
 
@@ -50,6 +50,7 @@ USB_INTR_VECTOR:
     push    YL						; 
 
 #ifdef TINY85MODE
+; look for magic word "B007" at the bottom of the stack
 	lds YL, RAMEND
 	cpi YL, 0xB0
 	brne cleanupAndJumpToApp
@@ -59,7 +60,7 @@ USB_INTR_VECTOR:
 	breq cleanupBootloaderIntStack
 
 cleanupAndJumpToApp:
-	; program counter was in application space, put registers back to normal and jump to app
+; magic word was not found, put registers back to where they were before this ISR ran, and jump to application ISR
 	pop YL
 	out      SREG, YL
 	pop YL
@@ -67,7 +68,8 @@ cleanupAndJumpToApp:
 	rjmp __vectors - TINYVECTOR_USBPLUS_OFFSET
 
 cleanupBootloaderIntStack:
-	CLR YL
+; magic word was found, put registers 
+	CLR YL					; [-19] ensure we meet below requirements for YL < 0x80 
 #endif
 ;----------------------------------------------------------------------------
 ; Synchronize with sync pattern:
