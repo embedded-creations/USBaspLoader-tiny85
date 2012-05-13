@@ -23,8 +23,12 @@ bottom to see the most recent changes.
 
 * Release 2010-07-27
 
-* Release 2012-08-08
+* Release 2012-04-07
 
 - by Louis Beaudoin (Embedded-Creations.com)
 - Added support for ATtiny85 
 
+* Release 2012-05-13
+
+- Added support for D+ line on pin change interrupt instead of INT0
+- Added support for two hardware configurations, described in Readme

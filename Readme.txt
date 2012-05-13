@@ -14,11 +14,37 @@ Because of the limited pin count on the tiny85, the boot loader doesn't look
 for an external condition to enter boot loader mode, it does it automatically
 before starting the application.  On reset the boot loader enumerates with the PC
 as a USBasp programmer, and jumps to the application after 5 seconds if there are
-no USBasp commands sent by the PC.  You can now flash the device with AVRDUDE 
+no USBasp commands sent by the PC.  You can flash the device with AVRDUDE 
 through a "virtual" USBasp programmer. If there is no valid application loaded
 (determined by verifying a checksum calculation across application program space)
 the boot loader will stay connected as a USBasp programmer until the flash is 
 written.
+
+
+HARDWARE CONFIGURATIONS
+=======================
+Even through the ATtiny85 only has 6 IO pins, there are a couple ways designers have 
+connected the USB signals to the tiny85.  
+
+Configuration 1
+The first configuration this bootloader supported was the configuration used by the 
+V-USB example "EasyLogger", and by Sparkfun in their AVR Stick: D- is connected to PB0
+and D+ is connected to PB2 (INT0).  This is convenient as INT0 can be used for USB, 
+and the Pin Change interrupts can be left free for the application to use, but 
+inconvienient as INT0 shares the same pin as USCK/SCL preventing use of the USI peripheral 
+in SPI or I2C mode.  Also, PB0 is used for MOSI/DI/SDA, preventing use of the USI 
+peripheral in UART mode as well as SPI and I2C.
+
+Configuration 2
+An alternate configuration, used by Little Wire, puts the D+ pin on PB4 and D- on PB3, 
+and uses Pin Change interrupts instead of INT0 for USB.  This allows the USI peripheral
+to be used by the application, but prevents using external interrupts: Pin Change 
+interrupts are used by USB, and INT0 shouldn't be used as it's a higher priority 
+interrupt than Pin Change, and will interfere with USB communication.
+
+(There's a third configuration used by vusbtiny: similar to configuration 2 but with the
+D- and D+ pins swapped.  I don't plan to support that configuration in the precompiled 
+binaries, though it can be generated easily by changing bootloaderconfig.h and recompiling.)
 
 
 For more information on the USBaspLoader-tiny85, please visit the
