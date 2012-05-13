@@ -279,6 +279,10 @@ static inline __attribute__((noreturn)) void leaveBootloader(void)
 #endif
 
 #ifdef TINY85MODE
+    // clear magic word from bottom of stack before jumping to the app
+    *(uint8_t*)(RAMEND) = 0x00;
+    *(uint8_t*)(RAMEND-1) = 0x00;
+
     // jump to application reset vector at end of flash
     asm volatile ("rjmp __vectors - 4");
 #else
@@ -495,6 +499,21 @@ uchar usbFunctionRead(uchar *data, uchar len)
     }
     return len;
 }
+
+/* ------------------------------------------------------------------------ */
+
+#ifdef TINY85MODE
+void PushMagicWord (void) __attribute__ ((naked)) __attribute__ ((section (".init3")));
+
+// put the word "B007" at the bottom of the stack (RAMEND - RAMEND-1)
+void PushMagicWord (void)
+{
+    asm volatile("ldi r16, 0xB0"::);
+    asm volatile("push r16"::);
+    asm volatile("ldi r16, 0x07"::);
+    asm volatile("push r16"::);
+}
+#endif
 
 /* ------------------------------------------------------------------------ */
 

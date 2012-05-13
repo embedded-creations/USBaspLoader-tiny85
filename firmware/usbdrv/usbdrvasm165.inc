@@ -46,20 +46,20 @@ of CPU cycles, but even an exact number of cycles!
 USB_INTR_VECTOR:
 ;order of registers pushed: YL, SREG [sofError], r0, YH, shift, x1, x2, x3, x4, cnt
     push    YL              ; push only what is necessary to sync with edge ASAP
-    in      YL, SREG				; [-36]
-    push    YL						; [-34]
+    in      YL, SREG				; 
+    push    YL						; 
 
 #ifdef TINY85MODE
-	push YH									; [-32]
-	in	YL, SPL								; [-30]
-	in	YH, SPH								; [-28]
-	adiw YL, 4								; [-26]
-	ld YL, Y 								; [-25] YL now contains the high byte of the program counter (word address)
-	cpi YL, ((BOOTLOADER_ADDRESS/256)/2) 	; [-23]
-	brge cleanupBootloaderIntStack 			; [-22] branch if high byte of program counter >= start of boot loader
+	lds YL, RAMEND
+	cpi YL, 0xB0
+	brne cleanupAndJumpToApp
 
+	lds YL, RAMEND-1
+	cpi YL, 0x07
+	breq cleanupBootloaderIntStack
+
+cleanupAndJumpToApp:
 	; program counter was in application space, put registers back to normal and jump to app
-	pop YH
 	pop YL
 	out      SREG, YL
 	pop YL
@@ -67,7 +67,7 @@ USB_INTR_VECTOR:
 	rjmp __vectors - TINYVECTOR_USBPLUS_OFFSET
 
 cleanupBootloaderIntStack:
-	pop YH					; [-20]
+	CLR YL
 #endif
 ;----------------------------------------------------------------------------
 ; Synchronize with sync pattern:
