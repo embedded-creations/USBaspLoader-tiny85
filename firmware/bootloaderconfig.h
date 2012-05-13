@@ -68,22 +68,22 @@ these macros are defined, the boot loader uses them.
 #if (defined __AVR_ATtiny85__) && (HARDWARE_CONFIG == TINY85_HARDWARE_CONFIG_1)
 #	define USB_CFG_DMINUS_BIT      0
 /* This is the bit number in USB_CFG_IOPORT where the USB D- line is connected.
- * This may be any bit in the port, but must be configured as a pinchange interrupt (see below)
+ * This may be any bit in the port.
  */
 #	define USB_CFG_DPLUS_BIT       2
 /* This is the bit number in USB_CFG_IOPORT where the USB D+ line is connected.
- * This may be any bit in the port.
+ * This may be any bit in the port, but must be configured as a pin change interrupt.
  */
  #endif
  
 #if (defined __AVR_ATtiny85__) && (HARDWARE_CONFIG == TINY85_HARDWARE_CONFIG_2)
 #	define USB_CFG_DMINUS_BIT      3
 /* This is the bit number in USB_CFG_IOPORT where the USB D- line is connected.
- * This may be any bit in the port, but must be configured as a pinchange interrupt (see below)
+ * This may be any bit in the port.
  */
 #	define USB_CFG_DPLUS_BIT       4
 /* This is the bit number in USB_CFG_IOPORT where the USB D+ line is connected.
- * This may be any bit in the port.
+ * This may be any bit in the port, but must be configured as a pin change interrupt.
  */
  #endif
 
@@ -195,9 +195,9 @@ these macros are defined, the boot loader uses them.
 #       define BOOTLOADER_CAN_EXIT 1
 #   endif
 
-// setup interrupt for Pin Change for D-
+// setup interrupt for Pin Change for D+
 #   define USB_INTR_CFG            PCMSK
-#   define USB_INTR_CFG_SET        (1 << USB_CFG_DMINUS_BIT)
+#   define USB_INTR_CFG_SET        (1 << USB_CFG_DPLUS_BIT)
 #   define USB_INTR_CFG_CLR        0
 #   define USB_INTR_ENABLE         GIMSK
 #   define USB_INTR_ENABLE_BIT     PCIE
