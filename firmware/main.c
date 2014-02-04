@@ -164,8 +164,10 @@ static void writeWordToPageBuffer(uint16_t data)
         data = 0xC000 + (BOOTLOADER_ADDRESS/2) - 1;
 
     // write 2's complement of checksum
+#ifdef APPCHECKSUM
     if(CURRENT_ADDRESS == BOOTLOADER_ADDRESS - APPCHECKSUM_POSITION)
         data = (uint8_t)(~checksum + 1);
+#endif
 
     if(CURRENT_ADDRESS == BOOTLOADER_ADDRESS - TINYVECTOR_RESET_OFFSET)
         data = vectorTemp[0] + ((FLASHEND + 1) - BOOTLOADER_ADDRESS)/2 + 2 + RESET_VECTOR_OFFSET;
@@ -173,8 +175,10 @@ static void writeWordToPageBuffer(uint16_t data)
     if(CURRENT_ADDRESS == BOOTLOADER_ADDRESS - TINYVECTOR_USBPLUS_OFFSET)
         data = vectorTemp[1] + ((FLASHEND + 1) - BOOTLOADER_ADDRESS)/2 + 1 + USBPLUS_VECTOR_OFFSET;
 
+#ifdef APPCHECKSUM
     // only calculate checksum when we are writing new data to flash (ignore when writing vectors after bootloader programming)
     checksum += (uint8_t)(data/256) + (uint8_t)(data);
+#endif
 
     // clear page buffer as a precaution before filling the buffer on the first page
     // TODO: maybe clear on the first byte of every page?
@@ -544,7 +548,9 @@ static inline void tiny85FlashInit(void)
 
     // TODO: necessary to reset CURRENT_ADDRESS?
     CURRENT_ADDRESS = 0;
-    checksum = 0;
+#   ifdef APPCHECKSUM
+        checksum = 0;
+#   endif
 }
 
 static inline void tiny85FlashWrites(void)
@@ -557,7 +563,9 @@ static inline void tiny85FlashWrites(void)
         eraseApplication();
         sei();
 
+#ifdef APPCHECKSUM
         checksum = 0;
+#endif
         eraseRequested = 0;
     }
 #endif
