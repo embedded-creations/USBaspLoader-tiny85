@@ -186,7 +186,8 @@ read_fuses:
 	$(UISP) --rd_fuses
 
 clean:
-	rm -f main.hex main.bin *.o usbdrv/*.o main.s usbdrv/oddebug.s usbdrv/usbdrv.s libs-device/osccal.o
+	rm -f main.hex main.bin *.o usbdrv/*.o main.s usbdrv/oddebug.s usbdrv/usbdrv.s libs-device/osccal.o \
+		main.c.lst main.map usbdrv/*.lst libs-device/*.lst
 
 # file targets:
 main.bin:	$(OBJECTS)
