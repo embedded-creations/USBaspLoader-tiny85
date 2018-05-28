@@ -44,9 +44,10 @@ these macros are defined, the boot loader uses them.
 
 #define TINY85_HARDWARE_CONFIG_1 	1
 #define TINY85_HARDWARE_CONFIG_2 	2
+#define TINY85_HARDWARE_CONFIG_3	3
 
 /* ---------------------------- Hardware Config ---------------------------- */
-#define HARDWARE_CONFIG 		TINY85_HARDWARE_CONFIG_2
+#define HARDWARE_CONFIG 		TINY85_HARDWARE_CONFIG_3
 
 #define USB_CFG_IOPORTNAME      B
 /* This is the port where the USB bus is connected. When you configure it to
@@ -82,6 +83,17 @@ these macros are defined, the boot loader uses them.
  * This may be any bit in the port.
  */
 #	define USB_CFG_DPLUS_BIT       4
+/* This is the bit number in USB_CFG_IOPORT where the USB D+ line is connected.
+ * This may be any bit in the port, but must be configured as a pin change interrupt.
+ */
+ #endif
+
+ #if (defined __AVR_ATtiny85__) && (HARDWARE_CONFIG == TINY85_HARDWARE_CONFIG_3)
+#	define USB_CFG_DMINUS_BIT      4
+/* This is the bit number in USB_CFG_IOPORT where the USB D- line is connected.
+ * This may be any bit in the port.
+ */
+#	define USB_CFG_DPLUS_BIT       3
 /* This is the bit number in USB_CFG_IOPORT where the USB D+ line is connected.
  * This may be any bit in the port, but must be configured as a pin change interrupt.
  */
